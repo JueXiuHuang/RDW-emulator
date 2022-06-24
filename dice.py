@@ -52,7 +52,14 @@ class Dice():
   def skill(self, **kwargs):
     return
   
-  def merge(self):
+  def can_merge(self, dice):
+    if dice.dice_type == self.dice_type:
+      return True
+    else:
+      return False
+
+  def merge(self, new_dice_type):
+    self.dice_type = new_dice_type
     return
 
 

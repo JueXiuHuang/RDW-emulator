@@ -47,9 +47,25 @@ class Game():
         for btn in self.BtnList:
           if btn.check_click(event.pos):
             self.DiceList = btn.click(self.DiceList)
-        for dice in self.DiceList:
-          if dice.is_drag:
-            dice.reset_dice_loc()
+        
+        # search the dice which can be merged
+        drag_idx = None
+        for idx in range(len(self.DiceList)):
+          if self.DiceList[idx].is_drag:
+            drag_idx = idx
+        if drag_idx != None:
+          for dice in self.DiceList:
+            check_a = not dice.is_drag
+            check_b = dice.can_merge(self.DiceList[drag_idx])
+            check_c = dice.rect.collidepoint(event.pos)
+            if all([check_a, check_b, check_c]):
+              dice_type = np.random.randint(1, 6)
+              dice.merge(dice_type)
+              self.DiceList[drag_idx].dice_type = 0
+          self.DiceList[drag_idx].reset_dice_loc()
+        # for dice in self.DiceList:
+        #   if dice.is_drag:
+        #     dice.reset_dice_loc()
       elif event.type == pyg.MOUSEMOTION:
         for dice in self.DiceList:
           if dice.is_drag:
@@ -117,13 +133,11 @@ class Game():
     return
   
   def update_board(self):
-    for y in range(self.board_h):
-      for x in range(self.board_w):
-        dice = self.DiceList[5*y+x]
-        dice_type = dice.dice_type
-        dice.draggable = dice_type != 0
-        dice.set_content(self.imgs[dice_type])
-    
+    for dice in self.DiceList:
+      dice_type = dice.dice_type
+      dice.draggable = dice_type != 0
+      dice.set_content(self.imgs[dice_type])
+
     return
 
 def main():
