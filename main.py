@@ -140,13 +140,13 @@ class Dice():
 
 
 class NormalDice(Dice):
-  def __init__(self, image, posx, posy, width, height)
+  def __init__(self, image, posx, posy, width, height):
     super().__init__(image, posx, posy, width, height)
     self.set_content(image)
 
 
 class JokerDice(Dice):
-  def __init__(self, image, posx, posy, width, height)
+  def __init__(self, image, posx, posy, width, height):
     super().__init__(image, posx, posy, width, height)
   
   def skill(self, **kwargs):
@@ -242,8 +242,8 @@ class Game():
       for x in range(len(self.board[y])):
         posx = x*self.gridsize + 50
         posy = y*self.gridsize + 50
-        
-        dice = Dice(posx, posy, self.dicesize, self.dicesize)
+        image = self.imgs[self.board[y][x]]
+        dice = Dice(image, posx, posy, self.dicesize, self.dicesize)
         dice.set_content(self.imgs[self.board[y][x]])
         
         self.DiceList.append(dice)
