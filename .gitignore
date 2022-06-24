@@ -3,6 +3,7 @@ Include/*
 Lib/*
 Scripts/*
 share/*
+__pycache__/*
 _bz2.pyd
 _ctypes.pyd
 _decimal.pyd
