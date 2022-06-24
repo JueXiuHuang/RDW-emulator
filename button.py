@@ -9,25 +9,28 @@ class Button():
   def set_surface(cls, surface):
     cls.surface = surface
   
-  def __init__(self, x, y, width, height, normal_color=None, pressing_color=None):
-    self.top_rect = pyg.Rect(x, y, width, height)
-    self.top_color = normal_color
+  def __init__(self, image, x, y, width, height, normal_color=None, pressing_color=None):
+    self.color = normal_color
     self.pressing_color = pressing_color
     self.normal_color = normal_color
+    self.image = image
+    self.rect = pyg.Rect(x, y, width, height)
+    self.img_rect = self.image.get_rect(center=self.rect.center)
     
     self.pressed = False
   
   def draw(self):
-    pyg.draw.rect(Button.surface, self.top_color, self.top_rect, border_radius=5)
+    pyg.draw.rect(Button.surface, self.color, self.rect, border_radius=5)
+    Button.surface.blit(self.image, self.img_rect)
   
   def click(self):
     return
   
   def color_change(self, color):
-    self.top_color = color
+    self.color = color
   
   def check_click(self, mouse_pos):
-    if self.top_rect.collidepoint(mouse_pos):
+    if self.rect.collidepoint(mouse_pos):
       # mouse left pressed
       if pyg.mouse.get_pressed()[0]:
         self.pressed = True
@@ -49,53 +52,33 @@ class Button():
 
 class SummonBtn(Button):
   def __init__(self, image, x, y, width, height):
-    super().__init__(x, y, width, height, pyg.Color(255, 209, 26), pyg.Color(255, 170, 0))
-    self.image = image
-    self.img_rect = self.image.get_rect(center=self.top_rect.center)
+    super().__init__(image, x, y, width, height, pyg.Color(255, 209, 26), pyg.Color(255, 170, 0))
   
-  def draw(self):
-    super().draw()
-    Button.surface.blit(self.image, self.img_rect)
-  
-  def click(self, board, stars):
+  def click(self, dice_list):
     print('Summon new dice...')
     
     # no slot for summon new dice
-    if np.sum((board == 0).astype(np.uint8)) == 0:
-      return board, stars
+    if np.sum([dice.dice_type == 0 for dice in dice_list]) == 0:
+      print('No more space')
+      return dice_list
     
-    board = np.reshape(board, -1)
-    stars = np.reshape(stars, -1)
-    
-    candidate = np.where(board == 0)[0]
+    candidate = np.where([dice.dice_type == 0 for dice in dice_list])[0]
     loc = np.random.choice(candidate)
     dice_type = np.random.randint(1, 6)
-    board[loc] = dice_type
-    stars[loc] += 1
-    
-    board = np.reshape(board, (3, 5))
-    stars = np.reshape(stars, (3, 5))
-    
-    print(board)
-    
-    return board, stars
+    dice_list[loc].dice_type = dice_type
+    dice_list[loc].dice_star += 1
+
+    return dice_list
 
 class ResetBtn(Button):
   def __init__(self, image, x, y, width, height):
-    super().__init__(x, y, width, height, pyg.Color(0, 230, 77))
-    self.image = image
-    self.img_rect = self.image.get_rect(center=self.top_rect.center)
+    super().__init__(image, x, y, width, height, pyg.Color(0, 230, 77))
   
-  def draw(self):
-    super().draw()
-    Button.surface.blit(self.image, self.img_rect)
-  
-  def click(self, b, s):
+  def click(self, dice_list):
     print('Reset the game...')
     
-    board = np.zeros((3, 5), dtype=np.int16)
-    boardStar = np.zeros((3, 5), dtype=np.int16)
+    for dice in dice_list:
+      dice.dice_type = 0
+      dice.dice_star = 0
     
-    print(board)
-    
-    return board, boardStar
+    return dice_list

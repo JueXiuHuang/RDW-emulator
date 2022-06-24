@@ -14,8 +14,8 @@ class Game():
     
     self.running = True
     self.surface = surface
-    self.board = np.zeros((3, 5), dtype=np.int16)
-    self.boardStar = np.zeros((3, 5), dtype=np.int16)
+    self.board_w = 5
+    self.board_h = 3
     self.load_img_from_disk()
     Dice.set_surface(self.surface)
     Button.set_surface(self.surface)
@@ -41,17 +41,26 @@ class Game():
         if event.button == 1:
           for btn in self.BtnList:
             btn.check_click(event.pos)
+          for dice in self.DiceList:
+            dice.is_dice_select(event.pos)
       elif event.type == pyg.MOUSEBUTTONUP:
         for btn in self.BtnList:
           if btn.check_click(event.pos):
-            self.board, self.boardStar = btn.click(self.board, self.boardStar)
+            self.DiceList = btn.click(self.DiceList)
+        for dice in self.DiceList:
+          if dice.is_drag:
+            dice.reset_dice_loc()
+      elif event.type == pyg.MOUSEMOTION:
+        for dice in self.DiceList:
+          if dice.is_drag:
+            dice.update_loc(event.rel)
   
   def play(self):
     while self.running:
       self.event_handler()
       if not self.running:
         break
-      # print(self.board)
+      self.surface.fill(pyg.Color("black"))
       self.update()
       self.draw()
       pyg.display.flip()
@@ -89,13 +98,14 @@ class Game():
   def init_board(self):
     self.DiceList = []
     
-    for y in range(len(self.board)):
-      for x in range(len(self.board[y])):
+    for y in range(self.board_h):
+      for x in range(self.board_w):
+        dice_type = 0
         posx = x*self.gridsize + 50
         posy = y*self.gridsize + 50
-        image = self.imgs[self.board[y][x]]
-        dice = Dice(image, posx, posy, self.dicesize, self.dicesize)
-        dice.set_content(self.imgs[self.board[y][x]])
+        image = self.imgs[dice_type]
+        dice = Dice(image, dice_type, posx, posy, self.dicesize, self.dicesize, (dice_type != 0))
+        dice.set_content(self.imgs[dice_type])
         
         self.DiceList.append(dice)
   
@@ -107,10 +117,12 @@ class Game():
     return
   
   def update_board(self):
-    for y in range(len(self.board)):
-      for x in range(len(self.board[y])):
+    for y in range(self.board_h):
+      for x in range(self.board_w):
         dice = self.DiceList[5*y+x]
-        dice.set_content(self.imgs[self.board[y][x]])
+        dice_type = dice.dice_type
+        dice.draggable = dice_type != 0
+        dice.set_content(self.imgs[dice_type])
     
     return
 

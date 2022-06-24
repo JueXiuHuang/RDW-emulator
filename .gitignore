@@ -1,9 +1,9 @@
-_asyncio.pyd
 Include/*
 Lib/*
 Scripts/*
 share/*
 __pycache__/*
+_asyncio.pyd
 _bz2.pyd
 _ctypes.pyd
 _decimal.pyd
