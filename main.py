@@ -33,6 +33,29 @@ class Game():
       _img = pyg.transform.scale(_img, (self.dicesize, self.dicesize))
       self.imgs.append(_img)
   
+  def generate_random_dice(self):
+    dice_type = np.random.randint(1, 6)
+    image = self.imgs[dice_type]
+
+    if dice_type == 1:
+      new_dice = NormalDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+    elif dice_type == 2:
+      new_dice = JokerDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+    elif dice_type == 3:
+      new_dice = NormalDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+    elif dice_type == 4:
+      new_dice = NormalDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+    elif dice_type == 5:
+      new_dice = NormalDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+
+    return new_dice
+
+  def generate_empty_dice(self):
+    dice_type = 0
+    image = self.imgs[dice_type]
+    new_dice = NormalDice(image, dice_type, 0, 0, self.dicesize, self.dicesize, (dice_type != 0))
+    return new_dice
+
   def event_handler(self):
     for event in pyg.event.get():
       if event.type == pyg.QUIT:
@@ -44,28 +67,30 @@ class Game():
           for dice in self.DiceList:
             dice.is_dice_select(event.pos)
       elif event.type == pyg.MOUSEBUTTONUP:
+        new_dice = self.generate_random_dice()
         for btn in self.BtnList:
           if btn.check_click(event.pos):
-            self.DiceList = btn.click(self.DiceList)
+            self.DiceList = btn.click(self.DiceList, new_dice)
         
         # search the dice which can be merged
-        drag_idx = None
+        dice_a_idx = None
+        dice_b_idx = None
         for idx in range(len(self.DiceList)):
           if self.DiceList[idx].is_drag:
-            drag_idx = idx
-        if drag_idx != None:
-          for dice in self.DiceList:
-            check_a = not dice.is_drag
-            check_b = dice.can_merge(self.DiceList[drag_idx])
-            check_c = dice.rect.collidepoint(event.pos)
-            if all([check_a, check_b, check_c]):
-              dice_type = np.random.randint(1, 6)
-              dice.merge(dice_type)
-              self.DiceList[drag_idx].dice_type = 0
-          self.DiceList[drag_idx].reset_dice_loc()
-        # for dice in self.DiceList:
-        #   if dice.is_drag:
-        #     dice.reset_dice_loc()
+            dice_a_idx = idx
+            self.DiceList[idx].is_drag = False
+          elif self.DiceList[idx].rect.collidepoint(event.pos):
+            dice_b_idx = idx
+          self.DiceList[idx].reset_dice_loc()
+        
+        if dice_a_idx != None and dice_b_idx != None:
+          # merge dice
+          new_dice_a = self.generate_empty_dice()
+          new_dice_b = self.generate_random_dice()
+          new_dice_a = self.DiceList[dice_a_idx].after_merge(new_dice_a, self.DiceList[dice_b_idx])
+          new_dice_b = self.DiceList[dice_a_idx].merge(new_dice_b, self.DiceList[dice_b_idx])
+          self.DiceList[dice_a_idx] = new_dice_a
+          self.DiceList[dice_b_idx] = new_dice_b
       elif event.type == pyg.MOUSEMOTION:
         for dice in self.DiceList:
           if dice.is_drag:
@@ -116,12 +141,12 @@ class Game():
     
     for y in range(self.board_h):
       for x in range(self.board_w):
-        dice_type = 0
         posx = x*self.gridsize + 50
         posy = y*self.gridsize + 50
-        image = self.imgs[dice_type]
-        dice = Dice(image, dice_type, posx, posy, self.dicesize, self.dicesize, (dice_type != 0))
-        dice.set_content(self.imgs[dice_type])
+        dice = self.generate_empty_dice()
+        dice.original_x = posx
+        dice.original_y = posy
+        dice.reset_dice_loc()
         
         self.DiceList.append(dice)
   
