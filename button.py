@@ -1,6 +1,8 @@
 import pygame as pyg
 import numpy as np
 
+from board import *
+
 class Button():
   # class attribute
   surface = None
@@ -54,32 +56,14 @@ class SummonBtn(Button):
   def __init__(self, image, x, y, width, height):
     super().__init__(image, x, y, width, height, pyg.Color(255, 209, 26), pyg.Color(255, 170, 0))
   
-  def click(self, dice_list, new_dice):
+  def click(self):
     print('Summon new dice...')
+    Board.summon_dice()
     
-    # no slot for summon new dice
-    if np.sum([dice.dice_type == 0 for dice in dice_list]) == 0:
-      print('No more space')
-      return dice_list
-    
-    candidate = np.where([dice.dice_type == 0 for dice in dice_list])[0]
-    loc = np.random.choice(candidate)
-
-    new_dice = dice_list[loc].copy_info(new_dice, need_cp_star=True)
-    new_dice.dice_star += 1
-    dice_list[loc] = new_dice
-
-    return dice_list
-
 class ResetBtn(Button):
   def __init__(self, image, x, y, width, height):
     super().__init__(image, x, y, width, height, pyg.Color(0, 230, 77))
   
-  def click(self, dice_list, new_dice):
+  def click(self):
     print('Reset the game...')
-    
-    for dice in dice_list:
-      dice.dice_type = 0
-      dice.dice_star = 0
-    
-    return dice_list
+    Board.reset_game()

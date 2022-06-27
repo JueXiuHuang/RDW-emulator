@@ -139,3 +139,11 @@ class JokerDice(Dice):
       cp_dice_b.reset_dice_loc()
 
       return cp_dice_b
+
+class GrowthDice(Dice):
+  def __init__(self, image, dice_type, posx, posy, width, height, draggable):
+    super().__init__(image, dice_type, posx, posy, width, height, draggable)
+
+class SacrificeDice(Dice):
+  def __init__(self, image, dice_type, posx, posy, width, height, draggable):
+    super().__init__(image, dice_type, posx, posy, width, height, draggable)
