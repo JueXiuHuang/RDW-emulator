@@ -37,7 +37,9 @@ class Game():
         self.board.update(event.rel)
   
   def play(self):
+    tick = 1
     while self.running:
+      self.board.check_skill()
       self.event_handler()
       if not self.running:
         break
@@ -45,6 +47,8 @@ class Game():
       self.update()
       self.draw()
       pyg.display.flip()
+
+      tick += 1
   
   def draw(self):
     self.board.draw()

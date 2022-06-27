@@ -1,3 +1,8 @@
+# Version 0.0.5
+1. add Growth dice utility
+2. add tick (10 ticks equals to 1 sec)
+3. make source code more object oriented
+
 # Version 0.0.4
 1. add Board class
 2. make source code more object oriented

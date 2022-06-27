@@ -1,5 +1,4 @@
 import pygame as pyg
-# import numpy as np
 
 class Dice():
   # class attribute
@@ -19,6 +18,10 @@ class Dice():
     self.dice_star = 0
     self.is_drag = False
     self.draggable = draggable
+
+    # 10 tick equals to 1 second
+    self.skill_tick = 10
+    self.skill_count_down = self.skill_tick
     
     self.set_content(image)
 
@@ -56,8 +59,16 @@ class Dice():
 
   def set_content(self, new_content):
     self.content = new_content
+
+  def check_skill_tick(self):
+    self.skill_count_down -= 1
+    if self.skill_count_down == 0:
+      self.skill_count_down = self.skill_tick
+      return True
+    else:
+      return False
   
-  def skill(self, **kwargs):
+  def skill(self, func):
     return
 
   def copy_info(self, dice, need_cp_star=True):
@@ -70,13 +81,6 @@ class Dice():
     
     return dice
   
-  def can_merge(self, dice):
-    # Return True if same dice_type
-    if dice.dice_type == self.dice_type:
-      return True
-    else:
-      return False
-
   def merge(self, new_dice, dice_b):
     # Dice A + Dice B -> Empty Dice + New Dice
     # This function will return New Dice
@@ -143,6 +147,15 @@ class JokerDice(Dice):
 class GrowthDice(Dice):
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):
     super().__init__(image, dice_type, posx, posy, width, height, draggable)
+    self.skill_tick = 5000#200
+    self.skill_count_down = self.skill_tick
+
+  def skill(self, func):
+    new_dice = func()
+    new_dice = self.copy_info(new_dice, need_cp_star=True)
+    new_dice.dice_star += 1
+
+    return new_dice
 
 class SacrificeDice(Dice):
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):

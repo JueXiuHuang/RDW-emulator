@@ -20,7 +20,7 @@ class Board():
     image = Board.imgs[dice_type]
 
     if dice_type == 1:
-      new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
+      new_dice = GrowthDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
     elif dice_type == 2:
       new_dice = JokerDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
     elif dice_type == 3:
@@ -29,7 +29,7 @@ class Board():
       new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
     elif dice_type == 5:
       new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
-
+    
     return new_dice
 
   @staticmethod
@@ -96,6 +96,14 @@ class Board():
       # merge dice
       self.merge_dice(dice_a_idx, dice_b_idx)
   
+  def check_skill(self):
+    for idx in range(len(Board.dice_list)):
+      can_activate = Board.dice_list[idx].check_skill_tick()
+      if can_activate:
+        new_dice = Board.dice_list[idx].skill(Board.generate_random_dice)
+        if new_dice:
+          Board.dice_list[idx] = new_dice
+
   def merge_dice(self, loc_a, loc_b):
     new_dice_a = Board.generate_empty_dice()
     new_dice_b = Board.generate_random_dice()
