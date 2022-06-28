@@ -1,3 +1,8 @@
+# Version 0.0.9
+1. add summon cost display
+2. add dice lvl up button
+3. add dice lvl up utility
+
 # Version 0.0.8
 1. add SP display and SP limit
 2. add displayer

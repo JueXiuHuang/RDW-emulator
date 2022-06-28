@@ -14,7 +14,7 @@ class Game():
     self.surface = surface
     self.font = font
     Dice.set_font_and_surface(font, surface)
-    Button.set_surface(self.surface)
+    Button.set_font_and_surface(font, surface)
     Displayer.set_font_and_surface(font, surface)
     self.running = True
     self.gridsize = Board.gridsize
@@ -23,24 +23,7 @@ class Game():
     self.init_btn()
     self.init_displayer()
     self.tick_sec_ratio = 1300
-  
-  def event_handler(self):
-    for event in pyg.event.get():
-      if event.type == pyg.QUIT:
-        self.running = False
-      elif event.type == pyg.MOUSEBUTTONDOWN:
-        if event.button == 1:
-          for btn in self.BtnList:
-            btn.check_click(event.pos)
-          self.board.check_dice_select(event.pos)
-      elif event.type == pyg.MOUSEBUTTONUP:
-        for btn in self.BtnList:
-          if btn.check_click(event.pos):
-            btn.click()
-        self.board.merge_check(event.pos)
-      elif event.type == pyg.MOUSEMOTION:
-        self.board.update(event.rel)
-  
+
   def play(self):
     tick = 1
     while self.running:
@@ -61,6 +44,23 @@ class Game():
 
       if Board.wave > 30:
         self.running = False
+  
+  def event_handler(self):
+    for event in pyg.event.get():
+      if event.type == pyg.QUIT:
+        self.running = False
+      elif event.type == pyg.MOUSEBUTTONDOWN:
+        if event.button == 1:
+          for btn in self.BtnList:
+            btn.check_click(event.pos)
+          self.board.check_dice_select(event.pos)
+      elif event.type == pyg.MOUSEBUTTONUP:
+        for btn in self.BtnList:
+          if btn.check_click(event.pos):
+            btn.click()
+        self.board.merge_check(event.pos)
+      elif event.type == pyg.MOUSEMOTION:
+        self.board.update(event.rel)
   
   def draw(self):
     self.board.draw()
@@ -93,6 +93,13 @@ class Game():
     btn = ResetBtn(image, x, y, self.dicesize+5, h)
     self.BtnList.append(btn)
 
+    for i in range(1, 6):
+      x = self.gridsize*(i-1) + 50
+      y = self.gridsize*3.4 + 50
+      h = self.gridsize*0.6
+      btn = LvlUpBtn(i, x, y, self.dicesize+5, h)
+      self.BtnList.append(btn)
+
   def init_displayer(self):
     self.displayer_list  = []
 
@@ -114,6 +121,8 @@ class Game():
     self.board.update()
     for dp in self.displayer_list:
       dp.update()
+    for btn in self.BtnList:
+      btn.update()
   
 def main():
   # Initialize pygame
@@ -124,7 +133,6 @@ def main():
   pyg.display.set_caption('Random Dice Wars Emulator')
   icon = pyg.image.load('img/AppIcon.png')
   pyg.display.set_icon(icon)
-
   font = pyg.font.Font(None, 30)
   
   # Initialize game

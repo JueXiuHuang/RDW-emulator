@@ -13,8 +13,9 @@ class Board():
   summon_cost = 5
   wave = 0
 
+  dice_lvl = [1, 1, 1, 1, 1, 1]
+  dice_lvl_cost = [150, 300, 500, 800, 1200]
   SP_list = [160, 200, 280, 400, 560, 760]
-  # SP level need wave = [4, 4, 6, 8, 8]
   SP_level_wave = [4, 8, 14, 22, 30]
 
   @staticmethod
@@ -76,6 +77,7 @@ class Board():
     Board.SP = 50
     Board.summon_cost = 5
     Board.wave = 0
+    Board.dice_lvl = [1, 1, 1, 1, 1, 1]
     
   def __init__(self):
     self.initialization()

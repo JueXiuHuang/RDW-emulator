@@ -6,10 +6,12 @@ from board import *
 class Button():
   # class attribute
   surface = None
+  font = None
   
   @classmethod
-  def set_surface(cls, surface):
+  def set_font_and_surface(cls, font, surface):
     cls.surface = surface
+    cls.font = font
   
   def __init__(self, image, x, y, width, height, normal_color=None, pressing_color=None):
     self.color = normal_color
@@ -26,6 +28,9 @@ class Button():
     Button.surface.blit(self.image, self.img_rect)
   
   def click(self):
+    return
+
+  def update(self):
     return
   
   def color_change(self, color):
@@ -55,10 +60,22 @@ class Button():
 class SummonBtn(Button):
   def __init__(self, image, x, y, width, height):
     super().__init__(image, x, y, width, height, pyg.Color(255, 209, 26), pyg.Color(255, 170, 0))
+    self.cost = str(Board.summon_cost)
   
   def click(self):
     print('Summon new dice...')
     Board.summon_dice()
+
+  def update(self):
+    self.cost = str(Board.summon_cost)
+
+  def draw(self):
+    super().draw()
+    text_surf = Button.font.render(self.cost, True, '#ff0000')
+    centerx = (self.rect.midtop[0]+self.rect.center[0])/2
+    centery = (self.rect.midtop[1]+self.rect.center[1])/2
+    text_rect = text_surf.get_rect(center=(centerx, centery))
+    Button.surface.blit(text_surf, text_rect)
     
 class ResetBtn(Button):
   def __init__(self, image, x, y, width, height):
@@ -69,5 +86,33 @@ class ResetBtn(Button):
     Board.reset_game()
 
 class LvlUpBtn(Button):
-  def __init__(self, image, x, y, width, height):
-    super().__init__(image, x, y, width, height, pyg.Color(0, 230, 77))
+  def __init__(self, dice_type, x, y, width, height):
+    self.dice_type = dice_type
+    self.lvl = str(Board.dice_lvl[self.dice_type])
+    image = Board.imgs[dice_type]
+    super().__init__(image, x, y, width, height, pyg.Color(0, 0, 0))
+
+  def click(self):
+    if Board.dice_lvl[self.dice_type] > 5:
+      print('Already max lvl...')
+      return
+    lvl = int(self.lvl) - 1
+    if Board.dice_lvl_cost[lvl] > Board.SP:
+      print('Not enough SP...')
+      return
+    print('Lvl up dice...')
+    Board.SP -= Board.dice_lvl_cost[lvl]
+    Board.dice_lvl[self.dice_type] += 1
+    return
+
+  def update(self):
+    self.lvl = str(Board.dice_lvl[self.dice_type])
+    return
+  
+  def draw(self):
+    # pyg.draw.rect(Button.surface, self.color, self.rect, border_radius=5)
+    # Button.surface.blit(self.image, self.img_rect)
+    super().draw()
+    text_surf = Button.font.render(self.lvl, True, '#ff0000')
+    text_rect = text_surf.get_rect(center=self.rect.center)
+    Button.surface.blit(text_surf, text_rect)
