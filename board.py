@@ -9,6 +9,7 @@ class Board():
   dicesize = 70
   board_h = 3
   board_w = 5
+  SP = 200
 
   @staticmethod
   def get_board_info():

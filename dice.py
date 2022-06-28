@@ -3,21 +3,26 @@ import pygame as pyg
 class Dice():
   # class attribute
   surface = None
+  font = None
   
   @classmethod
   def set_surface(cls, surface):
     cls.surface = surface
+
+  @classmethod
+  def set_font(cls, font):
+    cls.font = font
   
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):
     self.original_x = posx
     self.original_y = posy
     self.width = width
     self.height = height
-    self.rect = pyg.Rect(posx, posy, width, height)
     self.dice_type = dice_type
     self.dice_star = 0
     self.is_drag = False
     self.draggable = draggable
+    self.rect = pyg.Rect(posx, posy, width, height)
 
     # 10 tick equals to 1 second
     self.skill_tick = 10
@@ -34,8 +39,11 @@ class Dice():
     return new_dice
   
   def draw_content(self):
-    image_rect = self.content.get_rect(center = self.rect.center)
+    image_rect = self.content.get_rect(center=self.rect.center)
     Dice.surface.blit(self.content, image_rect)
+    text_surf = Dice.font.render(str(self.dice_star), True, '#ff0000')
+    text_rect = text_surf.get_rect(center=self.rect.center)
+    Dice.surface.blit(text_surf, text_rect)
   
   def draw(self):
     self.draw_content()
@@ -84,7 +92,7 @@ class Dice():
   def merge(self, new_dice, dice_b):
     # Dice A + Dice B -> Empty Dice + New Dice
     # This function will return New Dice
-    if self.dice_type != dice_b.dice_type:
+    if self.dice_type != dice_b.dice_type or self.dice_star != dice_b.dice_star:
       return dice_b
     
     new_dice = dice_b.copy_info(new_dice, need_cp_star=True)
@@ -96,7 +104,7 @@ class Dice():
   def after_merge(self, new_dice, dice_b):
     # Dice A + Dice B -> Empty Dice + New Dice
     # This function will return Empty Dice
-    if self.dice_type != dice_b.dice_type:
+    if self.dice_type != dice_b.dice_type or self.dice_star != dice_b.dice_star:
       self.reset_dice_loc()
       return self
 
@@ -119,7 +127,7 @@ class JokerDice(Dice):
     # Dice A + Dice B -> Dice B + Dice B
     # This function will return original Dice B
 
-    if self.dice_type == dice_b.dice_type:
+    if self.dice_type == dice_b.dice_type and self.dice_star == dice_b.dice_star:
       new_dice = dice_b.copy_info(new_dice, need_cp_star=True)
       new_dice.reset_dice_loc()
       new_dice.dice_star += 1
@@ -131,18 +139,19 @@ class JokerDice(Dice):
     # Dice A + Dice B -> Dice B + Dice B
     # This function will return copied Dice B
 
-    if self.dice_type == dice_b.dice_type:
+    if self.dice_type == dice_b.dice_type and self.dice_star == dice_b.dice_star:
       new_dice = self.copy_info(new_dice, need_cp_star=False)
       new_dice.reset_dice_loc()
       return new_dice
-    else:
+    elif self.dice_star == dice_b.dice_star:
       cp_dice_b = dice_b.copy()
       cp_dice_b = self.copy_info(cp_dice_b)
       cp_dice_b.dice_star = dice_b.dice_star
-
       cp_dice_b.reset_dice_loc()
-
       return cp_dice_b
+    else:
+      self.reset_dice_loc()
+      return self
 
 class GrowthDice(Dice):
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):

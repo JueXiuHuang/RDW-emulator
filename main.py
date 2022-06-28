@@ -8,10 +8,11 @@ from button import *
 from board import *
 
 class Game():
-  def __init__(self, surface):
+  def __init__(self, surface, font):
     # changeable parameters
     self.surface = surface
     Dice.set_surface(self.surface)
+    Dice.set_font(font)
     Button.set_surface(self.surface)
     self.running = True
     self.gridsize = Board.gridsize
@@ -95,9 +96,11 @@ def main():
   pyg.display.set_caption('Random Dice Wars Emulator')
   icon = pyg.image.load('img/AppIcon.png')
   pyg.display.set_icon(icon)
+
+  font = pyg.font.Font(None, 30)
   
   # Initialize game
-  game = Game(screen)
+  game = Game(screen, font)
   
   # Start the game
   game.play()
