@@ -1,3 +1,6 @@
+# Version 0.0.7
+1. add star limit
+
 # Version 0.0.6
 1. add merge star limit
 2. add star display
