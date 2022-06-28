@@ -6,12 +6,9 @@ class Dice():
   font = None
   
   @classmethod
-  def set_surface(cls, surface):
-    cls.surface = surface
-
-  @classmethod
-  def set_font(cls, font):
+  def set_font_and_surface(cls, font, surface):
     cls.font = font
+    cls.surface = surface
   
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):
     self.original_x = posx

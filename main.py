@@ -6,19 +6,23 @@ import cv2
 from dice import *
 from button import *
 from board import *
+from displayer import *
 
 class Game():
   def __init__(self, surface, font):
     # changeable parameters
     self.surface = surface
-    Dice.set_surface(self.surface)
-    Dice.set_font(font)
+    self.font = font
+    Dice.set_font_and_surface(font, surface)
     Button.set_surface(self.surface)
+    Displayer.set_font_and_surface(font, surface)
     self.running = True
     self.gridsize = Board.gridsize
     self.dicesize = Board.dicesize
     self.board = Board()
     self.init_btn()
+    self.init_displayer()
+    self.tick_sec_ratio = 1300
   
   def event_handler(self):
     for event in pyg.event.get():
@@ -50,9 +54,18 @@ class Game():
       pyg.display.flip()
 
       tick += 1
+      if tick % self.tick_sec_ratio == 0:
+        Board.wave += 1
+        idx = np.sum([Board.wave >= wave for wave in Board.SP_level_wave])
+        Board.SP += Board.SP_list[idx]
+
+      if Board.wave > 30:
+        self.running = False
   
   def draw(self):
     self.board.draw()
+    for dp in self.displayer_list:
+      dp.draw()
     
     for btn in self.BtnList:
       btn.draw()
@@ -79,13 +92,28 @@ class Game():
     h = self.gridsize*0.6
     btn = ResetBtn(image, x, y, self.dicesize+5, h)
     self.BtnList.append(btn)
+
+  def init_displayer(self):
+    self.displayer_list  = []
+
+    # Create Wave display button
+    x = self.gridsize*1.4 + 50
+    y = self.gridsize*0
+    h = self.gridsize*0.4
+    wd = WaveDisplayer(x, y, self.dicesize*2.4, h)
+    self.displayer_list.append(wd)
+
+    # Create SP display button
+    x = self.gridsize*5.2 + 50
+    y = self.gridsize*0
+    h = self.gridsize*0.4
+    sd = SPDisplayer(x, y, self.dicesize*1, h)
+    self.displayer_list.append(sd)
   
   def update(self):
-    self.update_button()
     self.board.update()
-  
-  def update_button(self):
-    return
+    for dp in self.displayer_list:
+      dp.update()
   
 def main():
   # Initialize pygame

@@ -1,3 +1,7 @@
+# Version 0.0.8
+1. add SP display and SP limit
+2. add displayer
+
 # Version 0.0.7
 1. add star limit
 

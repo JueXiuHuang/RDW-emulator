@@ -67,3 +67,7 @@ class ResetBtn(Button):
   def click(self):
     print('Reset the game...')
     Board.reset_game()
+
+class LvlUpBtn(Button):
+  def __init__(self, image, x, y, width, height):
+    super().__init__(image, x, y, width, height, pyg.Color(0, 230, 77))

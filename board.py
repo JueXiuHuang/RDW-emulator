@@ -9,7 +9,13 @@ class Board():
   dicesize = 70
   board_h = 3
   board_w = 5
-  SP = 200
+  SP = 50
+  summon_cost = 5
+  wave = 0
+
+  SP_list = [160, 200, 280, 400, 560, 760]
+  # SP level need wave = [4, 4, 6, 8, 8]
+  SP_level_wave = [4, 8, 14, 22, 30]
 
   @staticmethod
   def get_board_info():
@@ -47,6 +53,12 @@ class Board():
       print('No more space')
       return
     
+    if Board.SP < Board.summon_cost:
+      print('Not enough SP')
+      return
+    
+    Board.SP -= Board.summon_cost
+    Board.summon_cost += 5
     new_dice = Board.generate_random_dice()
 
     candidate = np.where([dice.dice_type == 0 for dice in Board.dice_list])[0]
@@ -61,6 +73,9 @@ class Board():
     for dice in Board.dice_list:
       dice.dice_type = 0
       dice.dice_star = 0
+    Board.SP = 50
+    Board.summon_cost = 5
+    Board.wave = 0
     
   def __init__(self):
     self.initialization()
@@ -126,6 +141,7 @@ class Board():
       dice.set_content(self.imgs[dice_type])
 
   def draw(self):
+
     for dice in Board.dice_list:
       dice.draw()
 
