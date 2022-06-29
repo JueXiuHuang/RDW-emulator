@@ -1,3 +1,6 @@
+# Version 0.1.0
+1. make source more readable.
+
 # Version 0.0.9
 1. add summon cost display
 2. add dice lvl up button

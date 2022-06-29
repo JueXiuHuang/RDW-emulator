@@ -1,6 +1,8 @@
 import numpy as np
 import os
+
 from dice import *
+from enums import *
 
 class Board():
   dice_list = []
@@ -27,22 +29,22 @@ class Board():
     dice_type = np.random.randint(1, 6)
     image = Board.imgs[dice_type]
 
-    if dice_type == 1:
+    if dice_type == DiceType.Growth.value:
       new_dice = GrowthDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
-    elif dice_type == 2:
+    elif dice_type == DiceType.Joker.value:
       new_dice = JokerDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
-    elif dice_type == 3:
+    elif dice_type == DiceType.Golem.value:
       new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
-    elif dice_type == 4:
+    elif dice_type == DiceType.Typhoon.value:
       new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
-    elif dice_type == 5:
+    elif dice_type == DiceType.Wind.value:
       new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
     
     return new_dice
 
   @staticmethod
   def generate_empty_dice():
-    dice_type = 0
+    dice_type = DiceType.Blank.value
     image = Board.imgs[dice_type]
     new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
     return new_dice
@@ -50,7 +52,7 @@ class Board():
   @staticmethod
   def summon_dice():
     # no slot for summon new dice
-    if np.sum([dice.dice_type == 0 for dice in Board.dice_list]) == 0:
+    if np.sum([dice.dice_type == DiceType.Blank.value for dice in Board.dice_list]) == 0:
       print('No more space')
       return
     
@@ -62,7 +64,7 @@ class Board():
     Board.summon_cost += 5
     new_dice = Board.generate_random_dice()
 
-    candidate = np.where([dice.dice_type == 0 for dice in Board.dice_list])[0]
+    candidate = np.where([dice.dice_type == DiceType.Blank.value for dice in Board.dice_list])[0]
     loc = np.random.choice(candidate)
 
     new_dice = Board.dice_list[loc].copy_info(new_dice, need_cp_star=True)
@@ -72,7 +74,7 @@ class Board():
   @staticmethod
   def reset_game():
     for dice in Board.dice_list:
-      dice.dice_type = 0
+      dice.dice_type = DiceType.Blank.value
       dice.dice_star = 0
     Board.SP = 50
     Board.summon_cost = 5
@@ -106,7 +108,7 @@ class Board():
       if dice.is_drag:
         dice_a_idx = idx
         dice.is_drag = False
-      elif dice.rect.collidepoint(pos) and dice.dice_type != 0:
+      elif dice.rect.collidepoint(pos) and dice.dice_type != DiceType.Blank.value:
         dice_b_idx = idx
       dice.reset_dice_loc()
     
@@ -139,11 +141,10 @@ class Board():
       if dice.is_drag and pos:
         dice.update_loc(pos)
       dice_type = dice.dice_type
-      dice.draggable = dice_type != 0
+      dice.draggable = dice_type != DiceType.Blank.value
       dice.set_content(self.imgs[dice_type])
 
   def draw(self):
-
     for dice in Board.dice_list:
       dice.draw()
 

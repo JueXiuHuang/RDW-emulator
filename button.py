@@ -110,8 +110,6 @@ class LvlUpBtn(Button):
     return
   
   def draw(self):
-    # pyg.draw.rect(Button.surface, self.color, self.rect, border_radius=5)
-    # Button.surface.blit(self.image, self.img_rect)
     super().draw()
     text_surf = Button.font.render(self.lvl, True, '#ff0000')
     text_rect = text_surf.get_rect(center=self.rect.center)

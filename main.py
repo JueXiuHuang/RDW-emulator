@@ -24,7 +24,7 @@ class Game():
     self.init_displayer()
     self.tick_sec_ratio = 1300
 
-  def play(self):
+  def human_play(self):
     tick = 1
     while self.running:
       self.board.check_skill()
@@ -139,7 +139,7 @@ def main():
   game = Game(screen, font)
   
   # Start the game
-  game.play()
+  game.human_play()
   
   # Quit
   pyg.quit()
