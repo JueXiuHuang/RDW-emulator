@@ -127,7 +127,7 @@ class Board():
       if dice.is_drag:
         dice_a_idx = idx
         dice.is_drag = False
-      elif dice.rect.collidepoint(pos) and dice.dice_type != DiceType.Blank.value:
+      elif dice.rect.collidepoint(pos):
         dice_b_idx = idx
       dice.reset_dice_loc()
     
@@ -152,6 +152,7 @@ class Board():
     success_, new_dice_b = Board.dice_list[loc_a].merge(new_dice_b, Board.dice_list[loc_b])
     Board.dice_list[loc_a] = new_dice_a
     Board.dice_list[loc_b] = new_dice_b
+    return success and success_
 
   @staticmethod
   def check_dice_select(pos):
