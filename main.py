@@ -27,7 +27,7 @@ class Game():
   def human_play(self):
     tick = 1
     while self.running:
-      self.board.check_skill()
+      Board.check_skill()
       self.event_handler()
       if not self.running:
         break
@@ -44,6 +44,7 @@ class Game():
 
       if Board.wave > 30:
         self.running = False
+        self.running = True
   
   def event_handler(self):
     for event in pyg.event.get():
@@ -53,17 +54,17 @@ class Game():
         if event.button == 1:
           for btn in self.BtnList:
             btn.check_click(event.pos)
-          self.board.check_dice_select(event.pos)
+          Board.check_dice_select(event.pos)
       elif event.type == pyg.MOUSEBUTTONUP:
         for btn in self.BtnList:
           if btn.check_click(event.pos):
             btn.click()
-        self.board.merge_check(event.pos)
+        Board.merge_check(event.pos)
       elif event.type == pyg.MOUSEMOTION:
-        self.board.update(event.rel)
+        Board.update(event.rel)
   
   def draw(self):
-    self.board.draw()
+    Board.draw()
     for dp in self.displayer_list:
       dp.draw()
     
@@ -118,7 +119,7 @@ class Game():
     self.displayer_list.append(sd)
   
   def update(self):
-    self.board.update()
+    Board.update()
     for dp in self.displayer_list:
       dp.update()
     for btn in self.BtnList:

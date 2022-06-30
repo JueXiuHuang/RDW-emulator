@@ -47,6 +47,7 @@ class Board():
     dice_type = DiceType.Blank.value
     image = Board.imgs[dice_type]
     new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, (dice_type != 0))
+    # new_dice = NormalDice(image, dice_type, 0, 0, Board.dicesize, Board.dicesize, True)
     return new_dice
 
   @staticmethod
@@ -54,11 +55,11 @@ class Board():
     # no slot for summon new dice
     if np.sum([dice.dice_type == DiceType.Blank.value for dice in Board.dice_list]) == 0:
       print('No more space')
-      return
+      return False
     
     if Board.SP < Board.summon_cost:
       print('Not enough SP')
-      return
+      return False
     
     Board.SP -= Board.summon_cost
     Board.summon_cost += 5
@@ -71,6 +72,8 @@ class Board():
     new_dice.dice_star += 1
     Board.dice_list[loc] = new_dice
 
+    return True
+
   @staticmethod
   def reset_game():
     for dice in Board.dice_list:
@@ -80,25 +83,41 @@ class Board():
     Board.summon_cost = 5
     Board.wave = 0
     Board.dice_lvl = [1, 1, 1, 1, 1, 1]
+
+  @staticmethod
+  def lvlup_dice(dice_type):
+    if Board.dice_lvl[dice_type] > 5:
+      print('Already max lvl...')
+      return False
+    lvl = Board.dice_lvl[dice_type] - 1
+    if Board.dice_lvl_cost[lvl] > Board.SP:
+      print('Not enough SP...')
+      return False
+    print('Lvl up dice...')
+    Board.SP -= Board.dice_lvl_cost[lvl]
+    Board.dice_lvl[dice_type] += 1
+    return True
     
   def __init__(self):
     self.initialization()
 
   def initialization(self):
-    self.load_img_from_disk()
-    self.init_board()
+    Board.load_img_from_disk()
+    Board.init_board()
 
-  def load_img_from_disk(self):
+  @staticmethod
+  def load_img_from_disk():
     img_names = ['Blank.png', 'Growth.png', 'Joker.png',
                   'Golem.png', 'Typhoon.png', 'Wind.png']
     
     for img in img_names:
       path = os.path.join('./img', img)
       _img = pyg.image.load(path)
-      _img = pyg.transform.scale(_img, (self.dicesize, self.dicesize))
+      _img = pyg.transform.scale(_img, (Board.dicesize, Board.dicesize))
       Board.imgs.append(_img)
 
-  def merge_check(self, pos):
+  @staticmethod
+  def merge_check(pos):
     # search the dice which can be merged
     dice_a_idx = None
     dice_b_idx = None
@@ -114,9 +133,10 @@ class Board():
     
     if dice_a_idx != None and dice_b_idx != None:
       # merge dice
-      self.merge_dice(dice_a_idx, dice_b_idx)
+      Board.merge_dice(dice_a_idx, dice_b_idx)
   
-  def check_skill(self):
+  @staticmethod
+  def check_skill():
     for idx in range(len(Board.dice_list)):
       can_activate = Board.dice_list[idx].check_skill_tick()
       if can_activate:
@@ -124,31 +144,36 @@ class Board():
         if new_dice:
           Board.dice_list[idx] = new_dice
 
-  def merge_dice(self, loc_a, loc_b):
+  @staticmethod
+  def merge_dice(loc_a, loc_b):
     new_dice_a = Board.generate_empty_dice()
     new_dice_b = Board.generate_random_dice()
-    new_dice_a = Board.dice_list[loc_a].after_merge(new_dice_a, Board.dice_list[loc_b])
-    new_dice_b = Board.dice_list[loc_a].merge(new_dice_b, Board.dice_list[loc_b])
+    success, new_dice_a = Board.dice_list[loc_a].after_merge(new_dice_a, Board.dice_list[loc_b])
+    success_, new_dice_b = Board.dice_list[loc_a].merge(new_dice_b, Board.dice_list[loc_b])
     Board.dice_list[loc_a] = new_dice_a
     Board.dice_list[loc_b] = new_dice_b
 
-  def check_dice_select(self, pos):
+  @staticmethod
+  def check_dice_select(pos):
     for dice in Board.dice_list:
       dice.is_dice_select(pos)
   
-  def update(self, pos=None):
+  @staticmethod
+  def update(pos=None):
     for dice in Board.dice_list:
       if dice.is_drag and pos:
         dice.update_loc(pos)
       dice_type = dice.dice_type
       dice.draggable = dice_type != DiceType.Blank.value
-      dice.set_content(self.imgs[dice_type])
+      dice.set_content(Board.imgs[dice_type])
 
-  def draw(self):
+  @staticmethod
+  def draw():
     for dice in Board.dice_list:
       dice.draw()
 
-  def init_board(self):
+  @staticmethod
+  def init_board():
     for y in range(Board.board_h):
       for x in range(Board.board_w):
         posx = x*Board.gridsize + 50

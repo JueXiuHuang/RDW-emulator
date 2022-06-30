@@ -93,17 +93,7 @@ class LvlUpBtn(Button):
     super().__init__(image, x, y, width, height, pyg.Color(0, 0, 0))
 
   def click(self):
-    if Board.dice_lvl[self.dice_type] > 5:
-      print('Already max lvl...')
-      return
-    lvl = int(self.lvl) - 1
-    if Board.dice_lvl_cost[lvl] > Board.SP:
-      print('Not enough SP...')
-      return
-    print('Lvl up dice...')
-    Board.SP -= Board.dice_lvl_cost[lvl]
-    Board.dice_lvl[self.dice_type] += 1
-    return
+    Board.lvlup_dice(self.dice_type)
 
   def update(self):
     self.lvl = str(Board.dice_lvl[self.dice_type])

@@ -1,5 +1,7 @@
 import pygame as pyg
 
+from enums import *
+
 class Dice():
   # class attribute
   surface = None
@@ -90,27 +92,31 @@ class Dice():
     # Dice A + Dice B -> Empty Dice + New Dice
     # This function will return New Dice
     if self.dice_type != dice_b.dice_type or \
-      self.dice_star != dice_b.dice_star or self.dice_star > 6:
-      return dice_b
+      self.dice_star != dice_b.dice_star or \
+      self.dice_type == DiceType.Blank.value or \
+      self.dice_star > 6:
+      return False, dice_b
     
     new_dice = dice_b.copy_info(new_dice, need_cp_star=True)
     new_dice.reset_dice_loc()
     new_dice.dice_star += 1
 
-    return new_dice
+    return True, new_dice
 
   def after_merge(self, new_dice, dice_b):
     # Dice A + Dice B -> Empty Dice + New Dice
     # This function will return Empty Dice
     if self.dice_type != dice_b.dice_type or \
-      self.dice_star != dice_b.dice_star or self.dice_star > 6:
+      self.dice_star != dice_b.dice_star or \
+      self.dice_type == DiceType.Blank.value or \
+      self.dice_star > 6:
       self.reset_dice_loc()
-      return self
+      return False, self
 
     new_dice = self.copy_info(new_dice, need_cp_star=False)
     new_dice.reset_dice_loc()
 
-    return new_dice
+    return True, new_dice
 
 
 class NormalDice(Dice):
@@ -131,9 +137,11 @@ class JokerDice(Dice):
       new_dice = dice_b.copy_info(new_dice, need_cp_star=True)
       new_dice.reset_dice_loc()
       new_dice.dice_star += 1
-      return new_dice
+      return True, new_dice
+    elif self.dice_star == dice_b.dice_star:
+      return True, dice_b
     else:    
-      return dice_b
+      return False, dice_b
 
   def after_merge(self, new_dice, dice_b):
     # Dice A + Dice B -> Dice B + Dice B
@@ -143,16 +151,16 @@ class JokerDice(Dice):
       self.dice_star == dice_b.dice_star and self.dice_star < 7:
       new_dice = self.copy_info(new_dice, need_cp_star=False)
       new_dice.reset_dice_loc()
-      return new_dice
+      return True, new_dice
     elif self.dice_star == dice_b.dice_star:
       cp_dice_b = dice_b.copy()
       cp_dice_b = self.copy_info(cp_dice_b)
       cp_dice_b.dice_star = dice_b.dice_star
       cp_dice_b.reset_dice_loc()
-      return cp_dice_b
+      return True, cp_dice_b
     else:
       self.reset_dice_loc()
-      return self
+      return False, self
 
 class GrowthDice(Dice):
   def __init__(self, image, dice_type, posx, posy, width, height, draggable):

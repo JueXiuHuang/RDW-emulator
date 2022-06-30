@@ -1,3 +1,6 @@
+# Version 1.0.0
+1. add success flag when action success
+
 # Version 0.1.0
 1. make source more readable.
 
